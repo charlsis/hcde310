@@ -36,7 +36,7 @@ print()
 count = {}
 
 for art in visits:
-
+# I'll come to office hours for this
 
 # BONUS (optional): Is Gus really "short"?
 # In #2, .get("minutes", 0) labeled Gus "short." But we don't know how long Gus stayed.
