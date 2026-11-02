@@ -28,7 +28,16 @@ def results():
     if books is None:
         return render_template("home.html", message="We couldn't reach the book database right now. Please try again in a few minutes.")
 
+    # Missing fields: keep only books that have a title
+    good_books = []
+    for book in books:
+        if book.get("title"):
+            good_books.append(book)
+    books = good_books
+
     # 5. No results, or nothing useful to show? → home page + message
+    if len(books) == 0:
+        return render_template("home.html", message=f"No books found for \"{author}\". Check the spelling or try another author.")
 
     # 6. Otherwise → results page
     return render_template("results.html", books=books, author=author)
