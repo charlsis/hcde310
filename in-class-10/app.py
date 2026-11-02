@@ -2,7 +2,8 @@
 # SKELETON: the whole path works (form → /results → results page) with fake data.
 # Next: replace one piece at a time, and commit each time something works.
 from flask import Flask, render_template, request   # request (Flask), not requests!
-from api import get_books
+from api import get_books_real
+
 
 app = Flask(__name__)
 
@@ -22,7 +23,8 @@ def results():
         return render_template("home.html", message="Please type an author's name to search.")
 
     # 3. Call the API (fake data for now)
-    books = get_books(author)
+    books = get_books_real(author)
+    print("BOOKS:", books)
 
     # 4. API error? (get_books returned None) → home page + message
     if books is None:
