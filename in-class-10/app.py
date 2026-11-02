@@ -24,7 +24,6 @@ def results():
 
     # 3. Call the API (fake data for now)
     books = get_books_real(author)
-    print("BOOKS:", books)
 
     # 4. API error? (get_books returned None) → home page + message
     if books is None:
