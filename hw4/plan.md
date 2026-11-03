@@ -44,3 +44,12 @@ Some artworks are missing these fields, so I'll show a default instead:
   1. Search "monet" → see Monet artworks with title, artist, and date
   2. Search "zzzzqqq" → see the "No artworks found" message
   3. An artwork with no date → shows "Unknown date" instead of a blank
+
+  ## Checks (run in the browser)
+- Search "monet" → Monet artworks with title, artist, date: **Pass**
+- Empty search → "Please type a search word.": **Pass**
+- Broken URL → "couldn't reach" error message: **Pass**
+- No results (temporary `return []`) → "No artworks found" message: **Pass**
+- Search "zzzzqqq" → **Fail**: the API's fuzzy search still returns artworks
+- Missing artist/date → shows "Unknown artist" / "Unknown date": **Pass**
+- Tab → search box, then button; Enter searches: **Pass**
