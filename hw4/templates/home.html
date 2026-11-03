@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><title>Art Search</title></head>
+<body>
+  <h1>Art Search</h1>
+    {% if message %}
+  <p>{{ message }}</p>
+    {% endif %}
+  <form action="/results" method="get">
+    <label for="search">Search for art</label>
+    <input id="search" name="search">
+    <button type="submit">Search</button>
+  </form>
+</body>
+</html>
