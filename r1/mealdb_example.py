@@ -4,7 +4,7 @@ import requests
 url = "https://www.themealdb.com/api/json/v1/1"    # the "1" is the free test key
 
 # --- Part 1: search by ingredient ---
-ingredient = "zzzz"
+ingredient = "salmon"
 r = requests.get(f"{url}/filter.php", params={"i": ingredient}, timeout=10)
 
 if r.status_code != 200:
