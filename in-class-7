@@ -1,0 +1,11 @@
+term = input("Search for: ")
+print("You searched for", term)
+print(type(term))
+
+import os
+import requests
+from dotenv import load_dotenv
+load_dotenv()                        # reads .env into environment variables
+key = os.getenv("NASA_API_KEY")
+
+u

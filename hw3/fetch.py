@@ -10,6 +10,7 @@ FIELDS = "id,title,artist_title,artist_display,date_display,place_of_origin,dime
 # Functions go here (above the code that runs)
 # PART 3
 def count_by_artist(results):
+    """Returns a dictionary of counts by artist"""
     counts = {}
     for art in results:
         a = art.get("artist_title") or "Unknown"
@@ -26,23 +27,25 @@ def save_results(artworks, filename):
             f.write(f"{titles} by {artist} on {date}")
 
 # PART 2
+# how to write a url in python
 term = input("Search the Art Institute for: ")
 
 url = "https://api.artic.edu/api/v1/artworks/search"
 params = {"q": term, "fields": FIELDS}
-response = requests.get(url, params=params)
+headers = {""} # the part that has email here
+response = requests.get(url, params=params, headers=headers)
 
 
 if response.status_code != 200:
     print(f"sorry the search didn't work: {response.status_code} {response.reason}")
 else:
-    data = response.json()
+    data = response.json() # turns the json to py
     results = data["data"]
     if len(results) == 0:
         print(f"No artworks found for '{term}'. Try another word.")
     else:
         for art in results:
-            titles = art.get("title") or "Untitled"
+            titles = art.get("title") or "Untitled" # or fits both case when value is null & when its empty
             artist = art.get("artist_title") or "Unknown Artist"
             display = art.get("artist_display") or "Unknown Display"
             date = art.get("date_display") or "Unknown date"

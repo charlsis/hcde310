@@ -24,3 +24,14 @@ else:
         print(r.json()[0]["date"])
     else:
         print("Request failed:", r.status_code, r.reason)
+
+def newest_photo(photos):                          # define a function that takes a list of photo dicts
+    if not photos:                                 # check if the list is empty
+        return None                                # nothing to compare, so return "no value"
+    return max(photos, key=lambda p: p["date"])    # pick the photo whose "date" is the latest
+
+if r.status_code == 200:                           # only continue if NASA's request succeeded
+    latest = newest_photo(r.json())                # turn the response into a list, find the newest photo
+    if latest:                                     # make sure we actually got a photo back (not None)
+        print(latest["caption"])                   # print the newest photo's caption
+        print(latest["date"])                      # print the newest photo's date

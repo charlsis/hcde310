@@ -4,6 +4,12 @@
 #
 # 1. Build a dictionary counting works per artist, and print it: `{'Vincent van Gogh': 1, ...}`. A
 #    work with no artist counts under `'Unknown'`.
+counts = {}
+for artwork in artworks:
+    artist = artwork.get("artist", "Unknown")       # job 1: who's the artist?
+    counts[artist] = counts.get(artist, 0) + 1      # job 2: add 1 to their count
+
+print(counts)
 # 2. Print the artist with the most works: `Most works: Claude Monet (2)`
 #
 # (This is the letter-counting pattern from Class 3, applied to art.)

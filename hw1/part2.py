@@ -23,10 +23,10 @@ for title in titles:
 print(f"Titles with an \"a\": {count}")
 
 # No.4
-longest = title[0]
+longest = titles[0]
 
 for title in titles:
-    if len(title) > len(longest):
+    if len(title) < len(longest):
         longest = title
 
 print(f"Longest: {longest}")

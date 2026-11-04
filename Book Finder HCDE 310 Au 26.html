@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book Finder by Century – Art Institute of Chicago</title>
+<style>
+  :root { --bg:#faf6ef; --ink:#2b2118; --accent:#8c3b2a; --card:#fff; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Georgia, serif; background:var(--bg); color:var(--ink); }
+  header { padding:2rem 1rem 1rem; text-align:center; }
+  h1 { margin:0 0 .25rem; font-weight:normal; }
+  form { display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap; padding:0 1rem; }
+  input, select, button { font:inherit; padding:.5rem .75rem; border:1px solid #bbb; border-radius:6px; }
+  button { background:var(--accent); color:#fff; border-color:var(--accent); cursor:pointer; }
+  #status { text-align:center; margin:1rem; font-style:italic; }
+  #results { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; padding:1rem; max-width:1100px; margin:auto; }
+  .card { background:var(--card); border-radius:8px; overflow:hidden; box-shadow:0 1px 4px #0002; }
+  .card img { width:100%; height:220px; object-fit:cover; display:block; background:#eee; }
+  .card div { padding:.75rem; font-size:.9rem; }
+  .card h3 { margin:0 0 .25rem; font-size:1rem; }
+  .card a { color:var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Book Finder by Century</h1>
+  <p>Search the Art Institute of Chicago's collection for books and book arts.</p>
+</header>
+
+<form id="search-form">
+  <input id="keyword" placeholder="Optional keyword (e.g. illuminated)">
+  <select id="type"></select>
+  <select id="century">
+    <option value="">Any century</option>
+  </select>
+  <button type="submit">Search</button>
+</form>
+
+<div id="status"></div>
+<div id="results"></div>
+
+<script>
+  const API = "https://api.artic.edu/api/v1/artworks/search";
+  const IIIF = "https://www.artic.edu/iiif/2";
+
+  const form = document.getElementById("search-form");
+  const keywordInput = document.getElementById("keyword");
+  const centurySelect = document.getElementById("century");
+  const typeSelect = document.getElementById("type");
+
+  // Artwork type IDs from the museum's artwork-types list (Book = 11 is the default).
+  // Non-book types are still narrowed with the word "book" so results stay relevant.
+  const TYPES = { 11: "Book", 18: "Print", 14: "Drawing and Watercolor", 31: "Design" };
+  for (const [id, name] of Object.entries(TYPES)) typeSelect.add(new Option(name, id));
+  const statusEl = document.getElementById("status");
+  const resultsEl = document.getElementById("results");
+
+  // Fill the dropdown with the 10th through 21st centuries.
+  for (let n = 10; n <= 21; n++) {
+    const suffix = n % 10 === 1 && n !== 11 ? "st" : n % 10 === 2 && n !== 12 ? "nd" : n % 10 === 3 && n !== 13 ? "rd" : "th";
+    centurySelect.add(new Option(`${n}${suffix} century`, (n - 1) * 100));
+  }
+
+  // Build the request body the API understands (Elasticsearch-style query).
+  function buildQuery(keyword, centuryStart, typeId) {
+    const filter = [
+      { exists: { field: "image_id" } },               // only artworks with pictures
+      { term: { artwork_type_id: Number(typeId) } }    // the chosen artwork type
+    ];
+    // For the Book type we don't need the word "book"; other types still do.
+    const text = ((typeId === "11" ? "" : "book ") + keyword).trim();
+    // Only add a text match when there is text. (An empty match_all gets mangled by the API.)
+    const bool = { filter };
+    if (text) bool.must = [{ multi_match: {
+      query: text,
+      fields: ["title", "artwork_type_title", "medium_display", "description"],
+      operator: "and" } }];
+    if (centuryStart !== "") {
+      const start = Number(centuryStart);
+      filter.push({ range: { date_start: { gte: start } } });
+      filter.push({ range: { date_end: { lte: start + 99 } } });
+    }
+    return {
+      query: { bool },
+      fields: "id,title,artist_display,date_display,image_id", // the API wants a comma-separated string, not a list,
+      limit: 24
+    };
+  }
+
+  // Turn one artwork into a card.
+  function renderCard(art) {
+    const card = document.createElement("div");
+    card.className = "card";
+    const img = `${IIIF}/${art.image_id}/full/400,/0/default.jpg`;
+    card.innerHTML = `
+      <img src="${img}" alt="" loading="lazy">
+      <div>
+        <h3></h3>
+        <p></p>
+        <a href="https://www.artic.edu/artworks/${art.id}" target="_blank" rel="noopener">View at the Art Institute</a>
+      </div>`;
+    // textContent keeps odd characters in titles from breaking the page.
+    card.querySelector("h3").textContent = art.title || "Untitled";
+    card.querySelector("p").textContent = `${art.artist_display || "Unknown maker"} · ${art.date_display || "n.d."}`;
+    return card;
+  }
+
+  async function search() {
+    statusEl.textContent = "Searching…";
+    resultsEl.innerHTML = "";
+    try {
+      // A plain GET (no custom headers) avoids the browser's CORS "preflight" check.
+      const params = JSON.stringify(buildQuery(keywordInput.value.trim(), centurySelect.value, typeSelect.value));
+      const res = await fetch(`${API}?params=${encodeURIComponent(params)}`);
+      if (!res.ok) { // show the server's own explanation, it usually names the bad field
+        const detail = await res.text();
+        throw new Error(`HTTP ${res.status} ${detail.slice(0, 200)}`);
+      }
+      const data = await res.json();
+      statusEl.textContent = data.data.length
+        ? `Showing ${data.data.length} of ${data.pagination.total} results`
+        : "No results. Try a different keyword or century.";
+      data.data.forEach(art => resultsEl.appendChild(renderCard(art)));
+    } catch (err) {
+      statusEl.textContent = "Something went wrong: " + err.message;
+    }
+  }
+
+  form.addEventListener("submit", e => { e.preventDefault(); search(); });
+  [centurySelect, typeSelect].forEach(el => el.addEventListener("change", search)); // filters re-search instantly
+  search(); // load something on first visit
+</script>
+</body>
+</html>

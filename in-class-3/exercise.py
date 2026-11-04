@@ -31,12 +31,13 @@ for art in visits:
 
 # 3. Print a blank line. Then build a dictionary counting visits per gallery, and print it:
 #       {'Impressionism': 3, 'Modern': 2, 'Photography': 2}
-print()
+gallery_count = {}
 
-count = {}
+for i in visits:
+        gallery_count[i["gallery"]] = gallery_count.get(i["gallery"], 0) +1
 
-for art in visits:
-# I'll come to office hours for this
+print(gallery_count)
+
 
 # BONUS (optional): Is Gus really "short"?
 # In #2, .get("minutes", 0) labeled Gus "short." But we don't know how long Gus stayed.
