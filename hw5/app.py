@@ -18,7 +18,8 @@ def results():
     try:
         artworks = get_artworks(artist)
     except Exception as e:
-        return render_template("home.html", message=f"Something broke the request: {e}")
+        print("API error:", e)     # details go to the terminal, for the developer
+        return render_template("home.html", message="We couldn't reach the Art Institute right now. Please try again in a few minutes.")
     return render_template("results.html", artist=artist, artworks=artworks)
 
 
