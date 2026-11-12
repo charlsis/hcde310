@@ -37,15 +37,37 @@ Answers to my two questions, in my own words:
    nothing happens and the code keeps going. It's like my HW4 `if r.status_code != 200`
 
 ## 5. My fix
-What was wrong:
-What I changed:
-How I checked it works:
-Commit before: (hash)  Commit after: (hash)
+What was wrong: When the API failed, the app showed the raw technical error to the user,
+like "Something broke the request: 500 Server Error... for url: https://api.artic.edu/...".
+It was confusing and showed the API's address
+
+What I changed: In app.py, in the `except` part of /results, I replaced the raw error with
+a friendly message: "We couldn't reach the Art Institute right now. Please try again in a
+few minutes." The real error is now printed to the terminal with print(), so the developer
+can still see it.
+
+How I checked it works: I broke the URL in api.py (artworksBROKEN), restarted the app and
+searched. The page showed the friendly message, and the terminal showed "API error: 500...".
+Then I put the URL back and ran python3 -m pytest: 3 tests still passed (the zzzz test
+still fails, as before). I also checked the change with git diff.
+
+Commit before: dd8cef6  Commit after: f98a996
 
 ## 6. Can we ship it? (100–150 words)
 Yes or no, and why:
+No, not tomorrow. The app works for a normal search like "Monet," but it has problems a
+real user would notice right away. The results never say who made each artwork, even
+though this is supposed to be an artist search. The images don't load and show up as
+broken boxes. If someone types a typo or a made-up word, the app still shows random
+artworks instead of saying "No results found," because nothing checks how good the match
+is. The error message was also confusing until I fixed it, and debug=True is risky if the
+app goes online. I would fix the artist name, the images, and the weak matches first.
 
-One thing my HW4 does better:
-One thing the AI's app does better:
+One thing my HW4 does better: it shows the artist for every artwork, and it gives a clear,
+friendly message for each problem (empty search, API error, no results)
+
+One thing the AI's app does better: it tries to show an image for each artwork, with
+"No image available" and "Date unknown" when that information is missing. My HW4 didn't
+show images at all.
 
 AI use goes in `ai_use.md` (the five points on the AI Use Card).

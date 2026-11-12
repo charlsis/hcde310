@@ -1,3 +1,9 @@
+# AI Use
+
+1. What I used it for: understanding the instructions and starter code, writing pytest tests, the AI
+   review (step 4), answering my 2 questions, and the fix (step 5). It also helped me
+   draft parts of findings.md, which I edited
+2. The full chat for step 4:
 Review this Flask app for bugs, missing error handling, accessibility and security problems. For each one, point to the line.
 
 app.py:
@@ -135,3 +141,8 @@ Compare the review with your 6 checks. Write these **in your own words**:
 - **Answers to my two questions:** a short version of the two answers above, in your words.
 
 Tell me when that's written, and we'll do **Step 5: the fix**.
+
+4. What the AI wrote: 3 pytest tests in test_app.py (I adjusted them), the friendly
+   error message fix in app.py.
+   
+5. Reflection: The AI helped me most with things I didn't understand. When the instructions were confusing, like what "boxes and arrows" meant or why I needed pytest tests when I could just test in the browser, it explained them in plain English with examples. It also helped me understand code I hadn't seen before, like raise_for_status(). Having it explained step by step made it less overwhelming. But I learned that the AI review isn't enough on its own like it couldn't tell that the images were broken because it didn't run the app. I only found that by testing it myself first.
